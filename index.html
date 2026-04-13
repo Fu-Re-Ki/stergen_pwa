@@ -707,7 +707,558 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 <div style="height:10px"></div>
 </div>
-  <div id="tab-besedy" style="display:none;padding:40px 20px;text-align:center;color:var(--text3)"><div style="font-size:13px;opacity:0.4">Беседы появятся скоро</div></div>
+  <div id="tab-besedy" style="display:none;padding-bottom:20px">
+<style>
+/* БЕСЕДЫ */
+.bs-section{padding:18px 20px 8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:500}
+.bs-section-desc{padding:0 20px 14px;font-size:12px;color:var(--text3);line-height:1.6}
+
+/* Вопросы для ужина */
+.bs-cats{display:flex;gap:7px;padding:0 20px 14px;overflow-x:auto;scrollbar-width:none}
+.bs-cats::-webkit-scrollbar{display:none}
+.bs-cat{flex-shrink:0;padding:5px 12px;border-radius:50px;font-size:11px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.bs-cat.active{background:var(--gold-dim);border-color:rgba(200,169,110,.35);color:var(--gold)}
+.bs-q-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin:0 20px 10px;cursor:pointer;transition:all .3s;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden}
+.bs-q-card:active{border-color:rgba(200,169,110,.35)}
+.bs-q-card.featured{border-color:rgba(200,169,110,.2);background:linear-gradient(135deg,#151D2E 0%,#131926 100%)}
+.bs-q-text{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--text);line-height:1.45;margin-bottom:6px}
+.bs-q-meta{font-size:10px;color:var(--text3)}
+.bs-q-age{display:inline-block;padding:2px 7px;border-radius:50px;border:1px solid var(--border);font-size:9px;color:var(--text3);margin-top:6px}
+.bs-shuffle{display:flex;align-items:center;gap:7px;margin:0 20px 6px;padding:11px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bs-shuffle span{font-size:13px;color:var(--text2);flex:1}
+.bs-shuffle svg{width:15px;height:15px;color:var(--text3)}
+
+/* Форматы */
+.fmt-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin:0 20px 10px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fmt-card:active{border-color:rgba(200,169,110,.35)}
+.fmt-header{padding:15px 16px;display:flex;align-items:center;gap:12px}
+.fmt-icon{width:38px;height:38px;border-radius:10px;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fmt-icon svg{width:18px;height:18px;color:var(--gold)}
+.fmt-info{flex:1}
+.fmt-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.fmt-meta{font-size:10px;color:var(--text3)}
+.fmt-toggle svg{width:14px;height:14px;color:var(--text3);transition:transform .2s}
+.fmt-card.open .fmt-toggle svg{transform:rotate(180deg)}
+.fmt-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.fmt-card.open .fmt-body{display:block}
+.fmt-desc{font-size:13px;color:var(--text2);line-height:1.65;padding:12px 0 10px}
+.fmt-rule{display:flex;gap:9px;margin-bottom:7px}
+.fmt-rn{width:20px;height:20px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--gold);flex-shrink:0;font-weight:500;margin-top:1px}
+.fmt-rt{font-size:12px;color:var(--text2);line-height:1.6}
+.fmt-qs-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:12px 0 8px;font-weight:500}
+.fmt-q{font-size:12px;color:var(--text2);padding:6px 10px;background:var(--bg4);border-radius:8px;margin-bottom:5px;line-height:1.5}
+
+/* Трудные разговоры */
+.hard-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin:0 20px 10px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hard-card:active{border-color:rgba(200,169,110,.35)}
+.hard-header{padding:14px 16px;display:flex;align-items:center;gap:11px}
+.hard-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.hard-info{flex:1}
+.hard-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.hard-sub{font-size:11px;color:var(--text3)}
+.hard-toggle svg{width:14px;height:14px;color:var(--text3);transition:transform .2s}
+.hard-card.open .hard-toggle svg{transform:rotate(180deg)}
+.hard-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.hard-card.open .hard-body{display:block}
+.hard-why{font-size:13px;color:var(--text2);line-height:1.65;padding:12px 0 10px}
+.hard-how-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;font-weight:500}
+.hard-how{font-size:12px;color:var(--text2);line-height:1.65;padding:8px 12px;background:var(--gold-faint);border-left:2px solid rgba(200,169,110,.25);border-radius:0 8px 8px 0;margin-bottom:10px}
+.hard-q{display:flex;gap:8px;margin-bottom:6px}
+.hard-qn{color:var(--gold);font-size:12px;min-width:14px;flex-shrink:0;font-style:italic}
+.hard-qt{font-size:12px;color:var(--text2);line-height:1.6}
+</style>
+
+<!-- ===== 1. ВОПРОСЫ ДЛЯ УЖИНА ===== -->
+<div class="bs-section">Вопросы для ужина</div>
+<div class="bs-section-desc">Один вопрос на сегодняшний вечер. Не нужно готовиться — просто выбери и спроси.</div>
+
+<div class="bs-cats" id="q-cats">
+  <button class="bs-cat active" onclick="filterQ(this,'all')">Все</button>
+  <button class="bs-cat" onclick="filterQ(this,'day')">О дне</button>
+  <button class="bs-cat" onclick="filterQ(this,'dream')">О мечтах</button>
+  <button class="bs-cat" onclick="filterQ(this,'value')">О ценностях</button>
+  <button class="bs-cat" onclick="filterQ(this,'deep')">Глубже</button>
+</div>
+
+<div class="bs-shuffle" onclick="shuffleQ()">
+  <span>Случайный вопрос</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6"/></svg>
+</div>
+
+<div id="q-list">
+
+<div class="bs-q-card featured" data-cat="day">
+  <div class="bs-q-text">Что сегодня было самым трудным — и как ты с этим справился?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Что сегодня тебя удивило?</div>
+  <div class="bs-q-age">5+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Был ли сегодня момент когда тебе было неловко — и почему?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Что ты сделал сегодня такого чего вчера не умел?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Кому ты сегодня был рад? И кому ты сам обрадовал?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Если бы сегодняшний день можно было переиграть — что бы ты изменил?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Назови одно хорошее что случилось сегодня — даже маленькое.</div>
+  <div class="bs-q-age">5+</div>
+</div>
+<div class="bs-q-card" data-cat="day">
+  <div class="bs-q-text">Что ты слышал сегодня такого что заставило тебя думать?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+
+<div class="bs-q-card featured" data-cat="dream">
+  <div class="bs-q-text">Если бы ты мог стать кем угодно на один день — кем бы стал и почему?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="dream">
+  <div class="bs-q-text">Что ты хочешь уметь делать через пять лет — чего не умеешь сейчас?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+<div class="bs-q-card" data-cat="dream">
+  <div class="bs-q-text">Если бы у тебя было неограниченно денег — что бы ты сделал первым делом?</div>
+  <div class="bs-q-age">7+</div>
+</div>
+<div class="bs-q-card" data-cat="dream">
+  <div class="bs-q-text">Куда ты хочешь поехать больше всего на свете — и что ты там хочешь увидеть?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="dream">
+  <div class="bs-q-text">Если бы ты мог изобрести что угодно — что это было бы?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="dream">
+  <div class="bs-q-text">Каким ты хочешь быть когда вырастешь — не кем работать, а каким человеком?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+<div class="bs-q-card" data-cat="dream">
+  <div class="bs-q-text">Есть ли у тебя мечта о которой ты никому не рассказывал? Хочешь рассказать сейчас?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+
+<div class="bs-q-card featured" data-cat="value">
+  <div class="bs-q-text">Что значит для тебя быть хорошим другом?</div>
+  <div class="bs-q-age">6+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Что ты сделал бы если бы нашёл кошелёк с деньгами и без документов?</div>
+  <div class="bs-q-age">7+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Что тебе важнее — чтобы тебя уважали или чтобы тебя любили? Можно ли иметь и то и другое?</div>
+  <div class="bs-q-age">10+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">За что ты себя уважаешь?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Если бы тебя описали одним словом — каким бы ты хотел чтобы это было слово?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Что труднее — сказать правду или промолчать? Почему?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Был ли у тебя момент когда ты сделал что-то хорошее — и никто об этом не узнал?</div>
+  <div class="bs-q-age">7+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Что для тебя важнее — победить или сыграть честно?</div>
+  <div class="bs-q-age">7+</div>
+</div>
+<div class="bs-q-card" data-cat="value">
+  <div class="bs-q-text">Кем из людей которых ты знаешь лично ты восхищаешься — и за что?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+
+<div class="bs-q-card featured" data-cat="deep">
+  <div class="bs-q-text">Что такое счастье для тебя — прямо сейчас?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Что бы ты сказал себе пятилетнему?</div>
+  <div class="bs-q-age">10+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Если бы завтра всё исчезло — что бы ты хотел чтобы люди помнили о тебе?</div>
+  <div class="bs-q-age">11+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Что тебя пугает — и что с этим страхом делать?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Есть ли что-то за что ты до сих пор себя ругаешь — хотя прошло уже время?</div>
+  <div class="bs-q-age">10+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Как ты понимаешь — когда поступаешь правильно? Это ощущение — как оно?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">За что ты благодарен нашей семье — прямо сейчас?</div>
+  <div class="bs-q-age">7+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Что в нашей семье ты хотел бы сохранить навсегда?</div>
+  <div class="bs-q-age">9+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Если бы ты мог поговорить с любым человеком из истории — с кем и о чём?</div>
+  <div class="bs-q-age">10+</div>
+</div>
+<div class="bs-q-card" data-cat="deep">
+  <div class="bs-q-text">Что сделало бы нашу семью ещё ближе?</div>
+  <div class="bs-q-age">8+</div>
+</div>
+
+</div><!-- end q-list -->
+
+<!-- ===== 2. ФОРМАТЫ ===== -->
+<div class="bs-section" style="padding-top:24px">Форматы семейных разговоров</div>
+<div class="bs-section-desc">Готовые структуры для разговора. Каждый формат с правилами — запускается за одну минуту.</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">Три хорошего за день</div>
+      <div class="fmt-meta">5 мин · каждый вечер · с 5 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Самый простой и самый работающий формат. Каждый называет три вещи которые были хорошими сегодня. Не достижения — просто хорошее. Тёплый чай, смешной момент в школе, что солнце светило. Родитель называет свои три тоже.</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Каждый называет ровно три. Не больше, не меньше.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">Никто не комментирует и не оценивает чужие три. Просто слушаем.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">Родитель говорит первым — это важно. Так дети видят что можно быть честным.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">4</div><div class="fmt-rt">Если ничего хорошего не было — называй самое нейтральное. Это тоже честно.</div></div>
+    <div class="fmt-qs-label">Вопросы для углубления</div>
+    <div class="fmt-q">Что из трёх было самым неожиданным?</div>
+    <div class="fmt-q">Есть ли что-то хорошее о чём ты не сказал — потому что казалось слишком маленьким?</div>
+  </div>
+</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">Машина времени</div>
+      <div class="fmt-meta">15–20 мин · раз в неделю · с 8 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Один человек «отправляется» в прошлое или будущее. Остальные задают вопросы — как журналисты. Развивает умение смотреть на себя со стороны и думать о последствиях. Родитель тоже «путешествует».</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Выбираете временную точку: «ты в 5 лет», «ты через 10 лет», «ты в день когда принял главное решение».</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">Путешественник отвечает от имени себя в то время — честно, как помнит или представляет.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">Остальные задают вопросы — не менее пяти. Слушают без оценок.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">4</div><div class="fmt-rt">В конце путешественник говорит одно: что бы он хотел сказать себе тогдашнему.</div></div>
+    <div class="fmt-qs-label">Стартовые точки</div>
+    <div class="fmt-q">Ты в свой первый день в школе. Что ты чувствуешь?</div>
+    <div class="fmt-q">Тебе 25 лет. Где ты? Чем занимаешься?</div>
+    <div class="fmt-q">Ты в день когда впервые сделал что-то по-настоящему трудное.</div>
+  </div>
+</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">Письмо себе через год</div>
+      <div class="fmt-meta">20–30 мин · раз в год · с 9 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Каждый пишет письмо себе — тому «я» которым станет через год. Про мечты, страхи, вопросы. Запечатывают и кладут в конверт с датой. Открывают ровно через год. Это один из самых мощных форматов для осознанности.</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Пишите одновременно — каждый своё, молча. 15–20 минут.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">Никто не читает чужое письмо — даже родитель детское, даже ребёнок родительское.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">Запечатайте в конверт. Напишите снаружи: «Открыть [дата через год]». Уберите в надёжное место.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">4</div><div class="fmt-rt">Через год открывайте вместе — и делитесь одним: что удивило больше всего.</div></div>
+    <div class="fmt-qs-label">Подсказки для письма</div>
+    <div class="fmt-q">Чего ты хочешь больше всего прямо сейчас?</div>
+    <div class="fmt-q">Что тебя пугает — и как ты с этим справляешься?</div>
+    <div class="fmt-q">Что ты хочешь сказать себе будущему?</div>
+  </div>
+</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">Суд ценностей</div>
+      <div class="fmt-meta">20–30 мин · раз в месяц · с 10 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Разбираете вместе одну дилемму — ситуацию где нет очевидного правильного ответа. Каждый высказывает свою позицию и аргументирует. Учит думать о ценностях через живые случаи — без нотаций и правильных ответов.</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Один зачитывает дилемму. Минута тишины — каждый думает.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">Каждый высказывается по очереди — без перебивания.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">После всех — можно задавать вопросы друг другу. Не спорить — уточнять.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">4</div><div class="fmt-rt">В конце каждый называет одно: что изменилось в его позиции после разговора.</div></div>
+    <div class="fmt-qs-label">Дилеммы для разбора</div>
+    <div class="fmt-q">Ты видел как друг списал на контрольной. Учитель не заметил. Что ты делаешь?</div>
+    <div class="fmt-q">Ты нашёл кошелёк. Внутри — много денег и визитка владельца. Что делаешь?</div>
+    <div class="fmt-q">Твой лучший друг сказал что-то обидное о тебе другим людям. Ты узнал случайно. Что делаешь?</div>
+    <div class="fmt-q">Ты можешь взять чужое — никто не видит, владелец богатый, тебе очень нужно. Берёшь?</div>
+  </div>
+</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">За что я благодарен</div>
+      <div class="fmt-meta">10 мин · раз в неделю · с 6 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Каждый называет одного конкретного человека которому благодарен за эту неделю — и говорит за что именно. Не «спасибо за всё» — а конкретное действие. Потом — одну вещь в жизни за которую благодарен прямо сейчас.</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Сначала человек. Конкретный. С конкретным действием: «Я благодарен Лёше за то что он...»</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">Потом вещь или момент из жизни. Не грандиозное — обычное. Тепло в квартире. Книга. Смех.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">Родитель называет и человека из семьи тоже — прямо при нём. Это меняет атмосферу.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">4</div><div class="fmt-rt">Никаких «правильных» ответов. Благодарность за маленькое — такая же настоящая.</div></div>
+    <div class="fmt-qs-label">Вопрос для углубления</div>
+    <div class="fmt-q">Знает ли этот человек что ты ему благодарен? Если нет — как можно ему об этом сказать?</div>
+  </div>
+</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">Самое трудное решение недели</div>
+      <div class="fmt-meta">15 мин · раз в неделю · с 9 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Каждый вспоминает одно решение которое принял на этой неделе — и которое было трудным. Рассказывает: что было, какие варианты, что выбрал и почему. Родитель обязательно рассказывает своё — из взрослой жизни. Это один из лучших способов показать детям что взрослые тоже сомневаются.</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Решение может быть любым — маленьким или большим. Важно что оно было трудным для тебя.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">Рассказывай честно — включая сомнения. «Я не знал что делать потому что...»</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">Остальные не советуют и не оценивают. Только один вопрос каждый: «А ты думал о...?»</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">4</div><div class="fmt-rt">В конце рассказчик говорит: доволен ли он своим решением сейчас.</div></div>
+    <div class="fmt-qs-label">Вопрос для углубления</div>
+    <div class="fmt-q">Если бы ты принимал это решение снова — что бы изменил?</div>
+  </div>
+</div>
+
+<div class="fmt-card" onclick="toggleFmt(this)">
+  <div class="fmt-header">
+    <div class="fmt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="fmt-info">
+      <div class="fmt-title">Если бы я был...</div>
+      <div class="fmt-meta">10–15 мин · в любое время · с 6 лет</div>
+    </div>
+    <div class="fmt-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="fmt-body">
+    <div class="fmt-desc">Лёгкий и весёлый формат который работает в машине, в очереди, за ужином. Один задаёт вопрос «если бы я был...» — все отвечают. Хорошо работает с малышами и помогает узнать как ребёнок видит мир.</div>
+    <div class="fmt-rule"><div class="fmt-rn">1</div><div class="fmt-rt">Задающий меняется каждый раз. Дети любят задавать вопросы взрослым.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">2</div><div class="fmt-rt">После ответа — можно спросить «почему?». Именно в «почему» живёт самое интересное.</div></div>
+    <div class="fmt-rule"><div class="fmt-rn">3</div><div class="fmt-rt">Нет неправильных ответов. Чем неожиданнее — тем лучше.</div></div>
+    <div class="fmt-qs-label">Вопросы для запуска</div>
+    <div class="fmt-q">Если бы я был животным — каким? Почему именно этим?</div>
+    <div class="fmt-q">Если бы я был книгой — какой? Почему?</div>
+    <div class="fmt-q">Если бы я был погодой — какой был бы сегодня?</div>
+    <div class="fmt-q">Если бы я мог взять только три вещи на необитаемый остров — что бы взял?</div>
+  </div>
+</div>
+
+<!-- ===== 3. ТРУДНЫЕ РАЗГОВОРЫ ===== -->
+<div class="bs-section" style="padding-top:24px">Трудные разговоры</div>
+<div class="bs-section-desc">Темы о которых говорить страшно. Но не говорить — страшнее. Здесь: почему важно, как начать, что спросить.</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#5B9BD5"></div>
+    <div class="hard-info">
+      <div class="hard-title">Деньги и достаток</div>
+      <div class="hard-sub">С 7 лет · тема которую избегают — и зря</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Дети чувствуют тревогу родителей вокруг денег — даже когда им ничего не говорят. Молчание создаёт домыслы. Честный разговор о деньгах — не про суммы, а про ценности — один из лучших уроков финансовой грамотности.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Ты когда-нибудь думал о том откуда берутся деньги в нашей семье? Хочешь поговорим об этом честно?»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Как ты думаешь — что такое деньги? Зачем они нужны людям?</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Есть ли что-то что нельзя купить за деньги? Что именно?</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Если бы у тебя было много денег — как бы ты понял что их уже достаточно?</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Что важнее — зарабатывать много или заниматься тем что нравится? Можно ли совместить?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#A0619A"></div>
+    <div class="hard-info">
+      <div class="hard-title">Смерть и потеря</div>
+      <div class="hard-sub">С 5 лет · говорить важнее чем молчать</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Дети думают о смерти — с очень раннего возраста. Когда взрослые избегают этой темы, дети остаются один на один со своими страхами и фантазиями. Честный разговор — не пугает, а успокаивает. Он говорит ребёнку: ты не один с этим.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">Через книгу, фильм или когда умерло животное: «Ты думаешь о том что все умрут когда-то? Давай поговорим об этом — мне тоже это бывает страшно думать.»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Ты когда-нибудь думал о смерти? Что именно тебя в этом беспокоит?</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Как ты думаешь — что остаётся от человека после того как его не стало?</div></div>
+    <div class="hard-q"><div class="hard-qt" style="font-style:italic;color:var(--text3)">[Родитель рассказывает о ком-то кого потерял — честно и без прикрас]</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Если бы ты знал что жить осталось один день — что бы ты сделал?</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Как ты думаешь — как надо жить чтобы не было жалко потраченного времени?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#C4623A"></div>
+    <div class="hard-info">
+      <div class="hard-title">Ошибки родителей</div>
+      <div class="hard-sub">С 9 лет · самый важный разговор</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Когда родитель рассказывает о своих ошибках — не поучая, а честно — происходит несколько важных вещей. Ребёнок понимает что ошибаться нормально. Что взрослые тоже не знают всего. Что признать ошибку — это сила, не слабость. Это один из самых ценных подарков который родитель может сделать.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Я хочу рассказать тебе об одной своей ошибке. Не чтобы поучать — а потому что думаю тебе важно знать что я тоже ошибаюсь.»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">[Родитель рассказывает одну настоящую ошибку из своей жизни — с деталями, без морали в конце]</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Как ты думаешь — что я мог бы сделать иначе тогда?</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Есть ли что-то в том как я тебя воспитываю — что тебя иногда обижает или кажется несправедливым? Я хочу услышать честно.</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Какую ошибку ты сам совершил недавно — и что она тебя научила?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#4A8C7A"></div>
+    <div class="hard-info">
+      <div class="hard-title">Страх и тревога</div>
+      <div class="hard-sub">С 6 лет · то что скрывается внутри</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Дети часто скрывают страхи — потому что боятся выглядеть слабыми или расстроить родителей. Когда взрослый первым называет свой страх — он даёт ребёнку разрешение тоже быть честным. Это разговор который снимает огромный груз.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Я хочу рассказать тебе о том чего боюсь. По-настоящему боюсь. А потом хочу спросить — есть ли что-то чего боишься ты?»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Что тебя пугает больше всего — прямо сейчас? Это может быть что угодно.</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Бывает ли такое что ты боишься — но не можешь объяснить чего именно?</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Что помогает тебе когда страшно — что работает лучше всего?</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Есть ли что-то о чём ты беспокоишься давно — но никому не говорил?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#C8A96E"></div>
+    <div class="hard-info">
+      <div class="hard-title">Несправедливость и злость</div>
+      <div class="hard-sub">С 8 лет · злиться — нормально</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Детям часто говорят «не злись» — но не учат что делать со злостью. Злость — нормальная реакция на несправедливость. Важно не подавить её, а научить проживать и использовать. Этот разговор про злость и про справедливость — один из ключей к эмоциональному интеллекту.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Я недавно злился на кое-что — и это было неприятное ощущение. Хочу рассказать тебе об этом. И потом спросить — что тебя злит?»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Что тебя злит больше всего? Что происходит внутри когда ты злишься?</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Есть ли что-то в мире или в жизни что кажется тебе несправедливым?</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Что ты делаешь со злостью? Что помогает чтобы не сказать и не сделать то о чём пожалеешь?</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Что бы ты изменил в мире если бы мог — чтобы стало справедливее?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#7AB87A"></div>
+    <div class="hard-info">
+      <div class="hard-title">Экраны и соцсети</div>
+      <div class="hard-sub">С 9 лет · без осуждения, честно</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Запреты без разговора не работают. Дети знают что экраны — это проблема, но им нужно понять почему — не из лекции, а из честного разговора. Когда родитель признаёт что сам залипает в телефон — разговор становится равным, а не обвинительным.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Я хочу поговорить с тобой про телефон — но не для того чтобы ругать. Я и сам залипаю больше чем хотел бы. Давай разберёмся вместе.»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Что ты делаешь в телефоне чаще всего? Что тебе это даёт?</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Бывает ли что ты вышел из телефона — и почувствовал что зря потратил время? Что это за ощущение?</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Есть ли что-то что ты делаешь меньше из-за телефона — и что тебе жаль?</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Какие правила про телефон в нашей семье были бы честными для всех — включая меня?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#D07070"></div>
+    <div class="hard-info">
+      <div class="hard-title">Буллинг и отношения со сверстниками</div>
+      <div class="hard-sub">С 7 лет · дети не всегда говорят сами</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Большинство детей которых обижают — молчат. Потому что стыдно, потому что боятся что станет хуже, потому что думают что родители не поймут. Регулярный разговор об отношениях со сверстниками — лучшая профилактика. Не допрос, а интерес.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Я хочу спросить тебя не про оценки, а про людей. Как у тебя с одноклассниками? Есть ли кто-то с кем тебе некомфортно?»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Есть ли в классе или во дворе кто-то с кем тебе неприятно общаться? Что происходит?</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Был ли ты свидетелем того как кого-то обижали? Что ты почувствовал и что сделал?</div></div>
+    <div class="hard-q"><div class="hard-qt" style="font-style:italic;color:var(--text3)">[Важно: не осуждать ответ «я ничего не сделал» — это честно и распространено]</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">Если бы тебя обижали — ты бы сказал мне? Что мешало бы тебе это сделать?</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Что должен сделать хороший человек когда видит что кого-то обижают?</div></div>
+  </div>
+</div>
+
+<div class="hard-card" onclick="toggleHard(this)">
+  <div class="hard-header">
+    <div class="hard-dot" style="background:#7B8FD4"></div>
+    <div class="hard-info">
+      <div class="hard-title">Что будет когда я вырасту</div>
+      <div class="hard-sub">С 10 лет · тревога о будущем</div>
+    </div>
+    <div class="hard-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="hard-body">
+    <div class="hard-why">Подростки живут с постоянным давлением «кем ты будешь». Это тревожит — особенно тех кто не знает. Честный разговор о неопределённости, о том что не знать — нормально, и что путь находится в процессе — даёт огромное облегчение.</div>
+    <div class="hard-how-label">Как начать</div>
+    <div class="hard-how">«Ты когда-нибудь тревожишься о том что будет когда вырастешь? Я хочу рассказать тебе честно как это было у меня — потому что я тоже не знал.»</div>
+    <div class="hard-how-label">Вопросы для разговора</div>
+    <div class="hard-q"><div class="hard-qn">1.</div><div class="hard-qt">Тебя беспокоит то что нужно выбрать профессию или путь? Что именно пугает?</div></div>
+    <div class="hard-q"><div class="hard-qn">2.</div><div class="hard-qt">Есть ли что-то что тебя тянет — даже если кажется несерьёзным или нереалистичным?</div></div>
+    <div class="hard-q"><div class="hard-qn">3.</div><div class="hard-qt">[Родитель рассказывает: знал ли он в твоём возрасте кем хочет быть? Как нашёл своё?]</div></div>
+    <div class="hard-q"><div class="hard-qn">4.</div><div class="hard-qt">Если бы никто не оценивал твой выбор — что бы ты хотел делать?</div></div>
+  </div>
+</div>
+
+<div style="height:10px"></div>
+</div><!-- end tab-besedy -->
   <div id="tab-praktiki" style="display:none;padding:40px 20px;text-align:center;color:var(--text3)"><div style="font-size:13px;opacity:0.4">Практики появятся скоро</div></div>
 </div>
 
@@ -3841,6 +4392,31 @@ window.addEventListener('DOMContentLoaded', () => {
 function toggleBook(el) {
   el.classList.toggle('open');
   pTap();
+}
+function toggleFmt(el) {
+  el.classList.toggle('open');
+  pTap();
+}
+function toggleHard(el) {
+  el.classList.toggle('open');
+  pTap();
+}
+function filterQ(btn, cat) {
+  btn.closest('.bs-cats').querySelectorAll('.bs-cat').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.bs-q-card').forEach(c => {
+    c.style.display = (cat === 'all' || c.dataset.cat === cat) ? 'block' : 'none';
+  });
+  pTap();
+}
+function shuffleQ() {
+  const visible = Array.from(document.querySelectorAll('.bs-q-card')).filter(c => c.style.display !== 'none');
+  if (!visible.length) return;
+  const pick = visible[Math.floor(Math.random() * visible.length)];
+  pick.scrollIntoView({behavior:'smooth', block:'center'});
+  pick.style.borderColor = 'rgba(200,169,110,0.5)';
+  setTimeout(() => pick.style.borderColor = '', 1500);
+  pTone(660, 0.15, 0.06);
 }
 
 // ===== NAV =====
